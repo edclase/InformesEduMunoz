@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Informes</string>
+    <string name="report_title">Job offers report</string>
 </resources>
