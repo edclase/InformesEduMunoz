@@ -1,5 +1,10 @@
 package com.esqroot.informes
 
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -7,10 +12,12 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import org.json.JSONArray
+import kotlin.math.min
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var offersContainer: LinearLayout
 
     private val offers = ArrayList<Offer>()
+    private val createPdfRequestCode = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +77,31 @@ class MainActivity : AppCompatActivity() {
             val selectedCity = spCity.selectedItem.toString()
             val filteredOffers = filterOffersByCity(selectedCity)
             showResult(selectedCity, filteredOffers)
+        }
+
+        btnExportPdf.setOnClickListener {
+            val selectedCity = spCity.selectedItem.toString()
+            val filteredOffers = filterOffersByCity(selectedCity)
+
+            showResult(selectedCity, filteredOffers)
+
+            // post waits until Android has measured the report before it is drawn into the PDF.
+            reportContainer.post {
+                openSavePdfPicker()
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == createPdfRequestCode && resultCode == RESULT_OK) {
+            val pdfUri = data?.data
+
+            if (pdfUri != null) {
+                exportReportPdf(pdfUri)
+            }
         }
     }
 
@@ -150,6 +183,68 @@ class MainActivity : AppCompatActivity() {
             txtOffer.setPadding(0, 0, 0, 24)
 
             offersContainer.addView(txtOffer)
+        }
+    }
+
+    private fun openSavePdfPicker() {
+        // The system file picker lets the user choose where to save the PDF (no storage permission needed).
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "application/pdf"
+        intent.putExtra(Intent.EXTRA_TITLE, "offers_report.pdf")
+
+        @Suppress("DEPRECATION")
+        startActivityForResult(intent, createPdfRequestCode)
+    }
+
+    private fun exportReportPdf(pdfUri: Uri) {
+        // PdfDocument creates a page and gives us a Canvas to draw the report on.
+        val pdfDocument = PdfDocument()
+        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        val pdfPage = pdfDocument.startPage(pageInfo)
+        val canvas = pdfPage.canvas
+
+        val titlePaint = Paint()
+        titlePaint.color = Color.BLACK
+        titlePaint.textSize = 24f
+        titlePaint.isFakeBoldText = true
+
+        canvas.drawColor(Color.WHITE)
+        canvas.drawText("Job offers report", 32f, 48f, titlePaint)
+
+        // Reuse the report that is already on screen: draw reportContainer onto the PDF canvas.
+        val availableWidth = 531f
+        val availableHeight = 760f
+        val reportWidth = reportContainer.width
+        val reportHeight = reportContainer.height
+
+        if (reportWidth > 0 && reportHeight > 0) {
+            val scale = min(availableWidth / reportWidth, availableHeight / reportHeight)
+
+            canvas.save()
+            canvas.translate(32f, 72f)
+            canvas.scale(scale, scale)
+            reportContainer.draw(canvas)
+            canvas.restore()
+        }
+
+        pdfDocument.finishPage(pdfPage)
+
+        try {
+            val output = contentResolver.openOutputStream(pdfUri)
+
+            if (output != null) {
+                output.use {
+                    pdfDocument.writeTo(output)
+                }
+                Toast.makeText(this, "PDF saved", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Could not save the PDF", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Could not save the PDF", Toast.LENGTH_LONG).show()
+        } finally {
+            pdfDocument.close()
         }
     }
 
