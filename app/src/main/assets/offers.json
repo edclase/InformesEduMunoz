@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "position": "Junior Android Developer",
+    "company": "TecnoLevante",
+    "city": "Valencia",
+    "salary": 21000
+  },
+  {
+    "id": 2,
+    "position": "Junior Kotlin Programmer",
+    "company": "AppSoluciones",
+    "city": "Valencia",
+    "salary": 22000
+  },
+  {
+    "id": 3,
+    "position": "Support Technician",
+    "company": "InfoAula",
+    "city": "Valencia",
+    "salary": 18000
+  },
+  {
+    "id": 4,
+    "position": "Junior Web Developer",
+    "company": "PixelSoft",
+    "city": "Valencia",
+    "salary": 20000
+  },
+  {
+    "id": 5,
+    "position": "Junior Analyst Programmer",
+    "company": "DatosPlus",
+    "city": "Valencia",
+    "salary": 23000
+  },
+  {
+    "id": 6,
+    "position": "Junior Android Developer",
+    "company": "MovilData",
+    "city": "Madrid",
+    "salary": 24000
+  },
+  {
+    "id": 7,
+    "position": "Junior Java Programmer",
+    "company": "NubeCentro",
+    "city": "Madrid",
+    "salary": 23000
+  },
+  {
+    "id": 8,
+    "position": "Junior QA Technician",
+    "company": "TestLab",
+    "city": "Madrid",
+    "salary": 21000
+  },
+  {
+    "id": 9,
+    "position": "Junior Backend Developer",
+    "company": "ServidorPro",
+    "city": "Madrid",
+    "salary": 25000
+  },
+  {
+    "id": 10,
+    "position": "Junior Full Stack Programmer",
+    "company": "CodigoClaro",
+    "city": "Madrid",
+    "salary": 26000
+  },
+  {
+    "id": 11,
+    "position": "Junior Android Developer",
+    "company": "CostaApps",
+    "city": "Alicante",
+    "salary": 20000
+  },
+  {
+    "id": 12,
+    "position": "Junior Kotlin Programmer",
+    "company": "MarDigital",
+    "city": "Alicante",
+    "salary": 21000
+  },
+  {
+    "id": 13,
+    "position": "Junior Systems Technician",
+    "company": "RedLocal",
+    "city": "Alicante",
+    "salary": 19000
+  },
+  {
+    "id": 14,
+    "position": "Junior Web Developer",
+    "company": "WebCosta",
+    "city": "Alicante",
+    "salary": 20500
+  },
+  {
+    "id": 15,
+    "position": "Junior Data Analyst",
+    "company": "DataMar",
+    "city": "Alicante",
+    "salary": 22500
+  }
+]
