@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtCountMadrid: TextView
     private lateinit var txtCountAlicante: TextView
     private lateinit var offersContainer: LinearLayout
+
+    private val offers = ArrayList<Offer>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +63,13 @@ class MainActivity : AppCompatActivity() {
         offersContainer = findViewById(R.id.offersContainer)
 
         setUpSpinner()
+        offers.addAll(loadOffers())
+
+        btnGenerateReport.setOnClickListener {
+            val selectedCity = spCity.selectedItem.toString()
+            val filteredOffers = filterOffersByCity(selectedCity)
+            showResult(selectedCity, filteredOffers)
+        }
     }
 
     private fun setUpSpinner() {
@@ -72,5 +82,76 @@ class MainActivity : AppCompatActivity() {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spCity.adapter = adapter
+    }
+
+    private fun loadOffers(): ArrayList<Offer> {
+        val offerList = ArrayList<Offer>()
+
+        // Read the JSON file from assets and turn it into a JSONArray.
+        val jsonText = assets.open("offers.json").bufferedReader().use { it.readText() }
+        val jsonArray = JSONArray(jsonText)
+
+        for (i in 0 until jsonArray.length()) {
+            val jsonObject = jsonArray.getJSONObject(i)
+
+            val offer = Offer(
+                jsonObject.getInt("id"),
+                jsonObject.getString("position"),
+                jsonObject.getString("company"),
+                jsonObject.getString("city"),
+                jsonObject.getInt("salary")
+            )
+
+            offerList.add(offer)
+        }
+
+        return offerList
+    }
+
+    private fun filterOffersByCity(city: String): List<Offer> {
+        // filter returns a new list with only the offers from the chosen city.
+        val result = if (city == "All") {
+            offers
+        } else {
+            offers.filter {
+                it.city == city
+            }
+        }
+
+        return result
+    }
+
+    private fun showResult(city: String, filteredOffers: List<Offer>) {
+        // Report figures calculated from the filtered list.
+        val offerCount = filteredOffers.size
+        val totalSalary = filteredOffers.sumOf { it.salary }
+        val averageSalary = if (filteredOffers.size > 0) {
+            filteredOffers.map { it.salary }.average()
+        } else {
+            0.0
+        }
+        val maxSalary = filteredOffers.maxOfOrNull { it.salary } ?: 0
+
+        txtSelectedCity.text = "Selected city: $city"
+        txtOfferCount.text = "Number of offers: $offerCount"
+        txtTotalSalary.text = "Total salary: ${formatSalary(totalSalary)}"
+        txtAverageSalary.text = "Average salary: ${formatSalary(averageSalary.toInt())}"
+        txtMaxSalary.text = "Maximum salary: ${formatSalary(maxSalary)}"
+
+        offersContainer.removeAllViews()
+
+        filteredOffers.forEachIndexed { index, offer ->
+            val txtOffer = TextView(this)
+            txtOffer.text = "${index + 1}. ${offer.position}\n" +
+                    "${offer.company} · ${offer.city} · ${formatSalary(offer.salary)}"
+            txtOffer.textSize = 16f
+            txtOffer.setPadding(0, 0, 0, 24)
+
+            offersContainer.addView(txtOffer)
+        }
+    }
+
+    private fun formatSalary(salary: Int): String {
+        return "%,d".format(salary).replace(",", ".") + " €"
     }
 }
