@@ -138,6 +138,8 @@ class MainActivity : AppCompatActivity() {
         txtAverageSalary.text = "Average salary: ${formatSalary(averageSalary.toInt())}"
         txtMaxSalary.text = "Maximum salary: ${formatSalary(maxSalary)}"
 
+        showChart(filteredOffers)
+
         offersContainer.removeAllViews()
 
         filteredOffers.forEachIndexed { index, offer ->
@@ -149,6 +151,28 @@ class MainActivity : AppCompatActivity() {
 
             offersContainer.addView(txtOffer)
         }
+    }
+
+    private fun showChart(filteredOffers: List<Offer>) {
+        // Chart: first count the data, then represent it with Views.
+        val offersValencia = filteredOffers.count { it.city == "Valencia" }
+        val offersMadrid = filteredOffers.count { it.city == "Madrid" }
+        val offersAlicante = filteredOffers.count { it.city == "Alicante" }
+
+        // 1 is included so the maximum can never be 0.
+        val maxValue = maxOf(offersValencia, offersMadrid, offersAlicante, 1)
+
+        barValencia.max = maxValue
+        barMadrid.max = maxValue
+        barAlicante.max = maxValue
+
+        barValencia.progress = offersValencia
+        barMadrid.progress = offersMadrid
+        barAlicante.progress = offersAlicante
+
+        txtCountValencia.text = offersValencia.toString()
+        txtCountMadrid.text = offersMadrid.toString()
+        txtCountAlicante.text = offersAlicante.toString()
     }
 
     private fun formatSalary(salary: Int): String {
