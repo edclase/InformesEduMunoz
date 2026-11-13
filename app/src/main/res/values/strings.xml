@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Informes</string>
     <string name="report_title">Job offers report</string>
+    <string name="city">City</string>
+    <string name="generate_report">Generate report</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="selected_city_empty">Selected city: -</string>
+    <string name="offer_count_empty">Number of offers: -</string>
+    <string name="total_salary_empty">Total salary: -</string>
+    <string name="average_salary_empty">Average salary: -</string>
+    <string name="max_salary_empty">Maximum salary: -</string>
+    <string name="offers_by_city">Offers by city</string>
+    <string name="offers">Offers</string>
 </resources>
